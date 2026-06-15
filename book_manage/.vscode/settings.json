@@ -1,0 +1,5 @@
+{
+    "python-envs.defaultEnvManager": "ms-python.python:system",
+    "python.defaultInterpreterPath": "C:\\Users\\Thái\\DemoDjango\\Myproject\\venv\\Scripts\\python.exe",
+    "python.pythonPath": "C:\\Users\\Thái\\DemoDjango\\Myproject\\venv\\Scripts\\python.exe"
+}
