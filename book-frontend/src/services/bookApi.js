@@ -156,6 +156,39 @@ export const login = async ({ apiUrl, username, password }) => {
   return response.json();
 };
 
+export const logout = async ({ apiUrl, refreshToken }) => {
+  let logoutUrl = 'http://localhost:8000/api/logout';
+  try {
+    if (apiUrl.includes('/api/')) {
+      const idx = apiUrl.indexOf('/api/');
+      logoutUrl = apiUrl.substring(0, idx) + '/api/logout';
+    } else {
+      const urlObj = new URL(apiUrl);
+      logoutUrl = `${urlObj.origin}/api/logout`;
+    }
+  } catch (e) {
+    // ignore
+  }
+
+  const response = await fetch(logoutUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ refresh: refreshToken })
+  });
+
+  if (!response.ok) {
+    let errData;
+    try {
+      errData = await response.json();
+    } catch (e) {
+      errData = {};
+    }
+    throw new Error(errData.error || `Lỗi đăng xuất: ${response.status}`);
+  }
+
+  return response.json();
+};
+
 export const register = async ({ apiUrl, username, email, password }) => {
   let registerUrl = 'http://localhost:8000/api/register';
   try {

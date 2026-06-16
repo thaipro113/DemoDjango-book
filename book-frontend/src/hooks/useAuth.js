@@ -18,9 +18,13 @@ export function useAuth({ apiUrl, showToast }) {
     try {
       const data = await bookApi.login({ apiUrl, username: loginUsername, password: loginPassword });
       const token = data.access;
+      const refreshToken = data.refresh;
       setAuthToken(token);
       setUsername(loginUsername);
       localStorage.setItem('auth_token', token);
+      if (refreshToken) {
+        localStorage.setItem('refresh_token', refreshToken);
+      }
       localStorage.setItem('username', loginUsername);
       showToast('Đăng nhập thành công!');
       return true;
@@ -49,13 +53,22 @@ export function useAuth({ apiUrl, showToast }) {
     }
   }, [apiUrl, showToast]);
 
-  const handleLogout = useCallback(() => {
+  const handleLogout = useCallback(async () => {
+    const refreshToken = localStorage.getItem('refresh_token');
+    if (refreshToken) {
+      try {
+        await bookApi.logout({ apiUrl, refreshToken });
+      } catch (err) {
+        console.error('Lỗi khi gọi API logout ở backend:', err);
+      }
+    }
     setAuthToken('');
     setUsername('');
     localStorage.removeItem('auth_token');
+    localStorage.removeItem('refresh_token');
     localStorage.removeItem('username');
     showToast('Đã đăng xuất thành công.');
-  }, [showToast]);
+  }, [apiUrl, showToast]);
 
   return {
     authToken,

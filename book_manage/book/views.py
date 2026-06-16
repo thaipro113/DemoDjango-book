@@ -8,6 +8,7 @@ from rest_framework.permissions import AllowAny
 from book.models import Book
 from .serializer import BookSerializer, UserSerializer
 from book.pagination import CustomPagination
+from rest_framework_simplejwt.tokens import RefreshToken
 
 class BookList(APIView):
     def get(self, request):
@@ -79,3 +80,18 @@ class RegisterUser(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class LogoutView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        try:
+            refresh_token = request.data.get('refresh')
+            if not refresh_token:
+                return Response({"error": "Refresh token is required"}, status=status.HTTP_400_BAD_REQUEST)
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+            return Response({"message": "Logout successful"}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
